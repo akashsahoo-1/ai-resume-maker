@@ -4,20 +4,55 @@ import { supabaseClient } from "@/lib/supabase";
 export async function POST(req: Request) {
     try {
         const body = await req.json();
-        const { fullName, email, phone, skills, experience, education, projects, generatedMarkdown } = body;
+        const {
+            title,
+            fullName,
+            email,
+            phone,
+            summary,
+            skills,
+            experience,
+            education,
+            projects,
+            certifications,
+            achievements,
+            languages,
+            github,
+            linkedin,
+            portfolio,
+            generatedMarkdown
+        } = body;
+
+        // Generate a unique slug based on fullName
+        const slug =
+            (fullName || "resume")
+                .toLowerCase()
+                .replace(/\s+/g, "-")
+                .replace(/[^a-z0-9-]/g, "") +
+            "-" +
+            Math.random().toString(36).substring(2, 7);
 
         const { data, error } = await supabaseClient
             .from("resumes")
             .insert([
                 {
+                    title,
                     full_name: fullName,
                     email,
                     phone,
+                    summary,
                     skills,
                     experience,
                     education,
                     projects,
+                    certifications,
+                    achievements,
+                    languages,
+                    github,
+                    linkedin,
+                    portfolio,
                     generated_markdown: generatedMarkdown,
+                    slug,
                 },
             ])
             .select();
