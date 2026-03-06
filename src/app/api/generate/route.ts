@@ -29,7 +29,7 @@ export async function POST(req: Request) {
                         6. Experience: Use "## Experience" as the heading. Use concise bullet points for responsibilities.
                         7. Projects: Use "## Projects" as the heading. List projects with their titles as H3. Do NOT use numbering.
                         8. Education: Use "## Education" as the heading. Render each education entry as a separate markdown list item (starting with "- ") on its own line. Split entries based on common separators like commas or newlines provided in the input. Ensure each degree/institution appears on a new line. (e.g., "- Degree — University (Year)").
-                        9. Other Sections (Certifications, Achievements, Languages): Use appropriate "##" headings ONLY if content exists.
+                        9. Other Sections (Certifications, Achievements, Languages, Hobbies): Use appropriate "##" headings ONLY if content exists.
                         
                         CRITICAL FORMATTING RULES FOR LINKS:
                         In the Header section, provide Email as a clickable markdown mailto link and Social Links as plain URLs:
@@ -51,15 +51,17 @@ export async function POST(req: Request) {
             
             ${body.experience && !['None', 'None listed', 'N/A'].includes(body.experience) ? `Experience: ${body.experience}` : ''}
             
-            ${body.projects && !['None', 'None listed', 'N/A'].includes(body.projects) ? `Projects: ${body.projects}` : ''}
+            ${body.includeProjects !== false && body.projects && !['None', 'None listed', 'N/A'].includes(body.projects) ? `Projects: ${body.projects}` : ''}
             
             ${body.education && !['None', 'None listed', 'N/A'].includes(body.education) ? `Education: ${body.education}` : ''}
             
-            ${body.certifications && !['None', 'None listed', 'N/A'].includes(body.certifications) ? `Certifications: ${body.certifications}` : ''}
+            ${body.includeCertifications !== false && body.certifications && !['None', 'None listed', 'N/A'].includes(body.certifications) ? `Certifications: ${body.certifications}` : ''}
             
-            ${body.achievements && !['None', 'None listed', 'N/A'].includes(body.achievements) ? `Achievements: ${body.achievements}` : ''}
+            ${body.includeAchievements !== false && body.achievements && !['None', 'None listed', 'N/A'].includes(body.achievements) ? `Achievements: ${body.achievements}` : ''}
             
-            ${body.languages && !['None', 'None listed', 'N/A'].includes(body.languages) ? `Languages: ${body.languages}` : ''}
+            ${body.includeLanguages !== false && body.languages && !['None', 'None listed', 'N/A'].includes(body.languages) ? `Languages: ${body.languages}` : ''}
+            
+            ${body.includeHobbies && body.hobbies && !['None', 'None listed', 'N/A'].includes(body.hobbies) ? `Hobbies: ${body.hobbies}` : ''}
             `,
                     },
                 ],
@@ -82,8 +84,8 @@ export async function POST(req: Request) {
         const markdown = data.choices[0].message.content;
 
         return NextResponse.json({ markdown });
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error("Generate route error:", error);
-        return NextResponse.json({ error: error.message || "Internal Server Error" }, { status: 500 });
+        return NextResponse.json({ error: error instanceof Error ? error.message : "Internal Server Error" }, { status: 500 });
     }
 }

@@ -20,6 +20,7 @@ export async function POST(req: Request) {
             github,
             linkedin,
             portfolio,
+            hobbies,
             generatedMarkdown
         } = body;
 
@@ -51,6 +52,7 @@ export async function POST(req: Request) {
                     github,
                     linkedin,
                     portfolio,
+                    hobbies,
                     generated_markdown: generatedMarkdown,
                     slug,
                 },
@@ -59,7 +61,7 @@ export async function POST(req: Request) {
 
         if (error) {
             console.error("Supabase insert error:", error);
-            return NextResponse.json({ error: "Failed to save to database" }, { status: 500 });
+            return NextResponse.json({ error: error.message || "Failed to save to database", details: error }, { status: 500 });
         }
 
         return NextResponse.json({ success: true, data });

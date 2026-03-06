@@ -23,10 +23,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" className="dark">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen bg-[#030014] text-neutral-50 selection:bg-purple-500/30`}
       >
+        {/* Fixed background gradients */}
+        <div className="fixed inset-0 z-[-1] bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-purple-900/20 via-[#030014] to-[#030014]"></div>
+        <div className="fixed top-0 left-0 w-full h-full z-[-1] bg-[url('/noise.png')] opacity-[0.03] mix-blend-overlay pointer-events-none"></div>
+        
         {children}
       </body>
     </html>

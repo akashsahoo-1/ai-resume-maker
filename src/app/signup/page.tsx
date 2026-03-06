@@ -46,10 +46,11 @@ export default function SignupPage() {
     };
 
     return (
-        <div className="min-h-screen bg-neutral-950 text-neutral-50 flex flex-col items-center justify-center p-6 selection:bg-indigo-500/30">
-            <div className="w-full max-w-md p-8 bg-neutral-900 border border-white/10 rounded-3xl shadow-2xl relative overflow-hidden">
+        <div className="min-h-screen flex flex-col items-center justify-center p-6 relative z-10">
+            <div className="w-full max-w-md p-8 bg-black/40 backdrop-blur-xl border border-white/10 rounded-3xl shadow-[0_0_40px_rgba(139,92,246,0.1)] relative overflow-hidden">
                 {/* Background glow */}
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[300px] h-[300px] bg-indigo-500/10 blur-[80px] rounded-full pointer-events-none" />
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[300px] h-[300px] bg-purple-500/20 blur-[80px] rounded-full pointer-events-none" />
+                <div className="absolute inset-0 bg-gradient-to-b from-purple-500/5 to-transparent pointer-events-none" />
 
                 <div className="relative z-10">
                     <Link
@@ -73,7 +74,7 @@ export default function SignupPage() {
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
                                 required
-                                className="w-full bg-neutral-950 border border-neutral-800 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all text-white placeholder:text-neutral-600"
+                                className="w-full bg-black/50 border border-white/10 focus:border-purple-500/50 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500/20 transition-all text-white placeholder:text-neutral-500"
                                 placeholder="you@example.com"
                             />
                         </div>
@@ -86,7 +87,7 @@ export default function SignupPage() {
                                 onChange={(e) => setPassword(e.target.value)}
                                 required
                                 minLength={6}
-                                className="w-full bg-neutral-950 border border-neutral-800 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all text-white placeholder:text-neutral-600"
+                                className="w-full bg-black/50 border border-white/10 focus:border-purple-500/50 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500/20 transition-all text-white placeholder:text-neutral-500"
                                 placeholder="••••••••"
                             />
                             <p className="text-xs text-neutral-500 mt-1">Must be at least 6 characters</p>
@@ -107,25 +108,28 @@ export default function SignupPage() {
                         <button
                             type="submit"
                             disabled={isLoading}
-                            className="w-full py-3 px-6 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-xl font-medium transition-all shadow-[0_0_20px_-5px_rgba(79,70,229,0.3)] flex justify-center items-center gap-2 mt-4"
+                            className="w-full py-3 px-6 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 border border-white/10 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-xl font-medium transition-all duration-300 shadow-[0_0_20px_-5px_rgba(139,92,246,0.4)] hover:shadow-[0_0_30px_-5px_rgba(139,92,246,0.6)] flex justify-center items-center gap-2 mt-4 relative overflow-hidden group/btn"
                         >
-                            {isLoading ? (
-                                <>
-                                    <Loader2 className="w-5 h-5 animate-spin" />
-                                    Creating account...
-                                </>
-                            ) : (
-                                <>
-                                    <UserPlus className="w-5 h-5" />
-                                    Sign Up
-                                </>
-                            )}
+                            <div className="absolute inset-0 bg-white/20 translate-y-full group-hover/btn:translate-y-0 transition-transform duration-300 ease-out z-0" />
+                            <div className="relative z-10 flex items-center gap-2">
+                                {isLoading ? (
+                                    <>
+                                        <Loader2 className="w-5 h-5 animate-spin" />
+                                        Creating account...
+                                    </>
+                                ) : (
+                                    <>
+                                        <UserPlus className="w-5 h-5 group-hover/btn:scale-110 transition-transform" />
+                                        <span>Sign Up</span>
+                                    </>
+                                )}
+                            </div>
                         </button>
                     </form>
 
                     <p className="mt-6 text-center text-sm text-neutral-400">
                         Already have an account?{" "}
-                        <Link href="/login" className="text-indigo-400 hover:text-indigo-300 transition-colors font-medium">
+                        <Link href="/login" className="text-purple-400 hover:text-purple-300 transition-colors font-medium hover:underline underline-offset-4">
                             Log in
                         </Link>
                     </p>

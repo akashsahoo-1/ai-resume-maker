@@ -3,7 +3,32 @@ import { NextResponse } from "next/server";
 export async function POST(req: Request) {
     try {
         const body = await req.json();
-        const { summary, skills, experience, projects, education, certifications, achievements, languages } = body;
+        const { summary, skills, experience, projects, education, certifications, achievements, languages, dreamJob } = body;
+
+        let systemPrompt = `You are an expert resume optimizer. Your task is to take the provided resume sections and enhance the wording to be more professional, impactful, and ATS-friendly. 
+                        
+                        Rules:
+                        1. Use strong action verbs (e.g., "Spearheaded", "Optimized", "Engineered").
+                        2. Quantify achievements where possible.
+                        3. Improve clarity and flow while keeping the content factual.
+                        4. Return the enhanced content as a JSON object with the exact same keys as provided.
+                        5. Do NOT change the structure or provide conversational text. Return ONLY the JSON object.`;
+
+        let userContent = `Enhance the following resume sections and return them in a JSON format:\n${JSON.stringify({ summary, skills, experience, projects, education, certifications, achievements, languages })}`;
+
+        if (dreamJob && dreamJob.trim() !== '') {
+            systemPrompt = `You are an expert resume optimizer. Your task is to take the provided resume sections and enhance the wording specifically for someone targeting the role of ${dreamJob}.
+                        
+                        Rules:
+                        1. Optimize the professional summary, skills, and project descriptions so the resume better matches the ${dreamJob} role.
+                        2. Use strong action verbs and industry-specific keywords for ${dreamJob}.
+                        3. Quantify achievements where possible.
+                        4. Improve clarity and flow while keeping the content factual.
+                        5. Return the enhanced content as a JSON object with the exact same keys as provided.
+                        6. Do NOT change the structure or provide conversational text. Return ONLY the JSON object.`;
+
+            userContent = `Enhance the following resume sections specifically for a ${dreamJob} position. Optimize the content to match this job role, and return it in a JSON format:\n${JSON.stringify({ summary, skills, experience, projects, education, certifications, achievements, languages })}`;
+        }
 
         const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
             method: "POST",
@@ -18,18 +43,11 @@ export async function POST(req: Request) {
                 messages: [
                     {
                         role: "system",
-                        content: `You are an expert resume optimizer. Your task is to take the provided resume sections and enhance the wording to be more professional, impactful, and ATS-friendly. 
-                        
-                        Rules:
-                        1. Use strong action verbs (e.g., "Spearheaded", "Optimized", "Engineered").
-                        2. Quantify achievements where possible.
-                        3. Improve clarity and flow while keeping the content factual.
-                        4. Return the enhanced content as a JSON object with the exact same keys as provided.
-                        5. Do NOT change the structure or provide conversational text. Return ONLY the JSON object.`,
+                        content: systemPrompt,
                     },
                     {
                         role: "user",
-                        content: `Enhance the following resume sections and return them in a JSON format:\n${JSON.stringify({ summary, skills, experience, projects, education, certifications, achievements, languages })}`,
+                        content: userContent,
                     },
                 ],
                 response_format: { type: "json_object" }
