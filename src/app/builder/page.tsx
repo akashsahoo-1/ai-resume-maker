@@ -84,29 +84,6 @@ const LoadingView = ({ type }: { type: "generate" | "analyze" | "enhance" | null
     );
 };
 
-const saveResume = async (resumeData: any) => {
-    const { data: { user } } = await supabaseClient.auth.getUser();
-
-    if (!user) {
-        console.warn("User not logged in");
-        return;
-    }
-
-    const { error } = await supabaseClient.from("resumes").insert({
-        full_name: resumeData.full_name,
-        email: resumeData.email,
-        phone: resumeData.phone,
-        summary: resumeData.summary,
-        skills: resumeData.skills,
-        user_id: user.id
-    });
-
-    if (error) {
-        console.error("Save failed:", error.message);
-    } else {
-        console.log("Resume saved successfully");
-    }
-};
 
 export default function BuilderPage() {
     const router = useRouter();
@@ -225,41 +202,52 @@ export default function BuilderPage() {
             const result = await response.json();
             setGeneratedMarkdown(result.markdown);
 
-            try {
-                const resumeData = {
-                    full_name: data.fullName,
-                    email: data.email,
-                    phone: data.phone,
-                    summary: data.summary,
-                    skills: data.skills
-                };
-                await saveResume(resumeData);
-            } catch (err) {
-                console.error(err);
-            }
+            const resumeData = {
+                full_name: data.fullName,
+                email: data.email,
+                phone: data.phone,
+                summary: data.summary,
+                skills: data.skills
+            };
 
-            // 2. Save to Supabase (in background or await)
-            setIsSaving(true);
-            const saveResponse = await fetch("/api/resumes", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    ...data,
-                    hobbies,
-                    title: `${data.fullName} Resume`,
-                    generatedMarkdown: result.markdown,
-                }),
-            });
+            const saveResume = async () => {
+              try {
+                const { data: { user } } = await supabaseClient.auth.getUser();
 
-            if (saveResponse.ok) {
-                const resData = await saveResponse.json();
-                if (resData.data && resData.data.length > 0) {
-                    setGeneratedSlug(resData.data[0].slug);
+                if (!user) {
+                  alert("User not logged in");
+                  return;
                 }
-                setSavedSuccess(true);
-            } else {
-                console.error("Failed to save to database");
-            }
+
+                const { data: insertData, error } = await supabaseClient
+                  .from("resumes")
+                  .insert([
+                    {
+                      full_name: resumeData.full_name,
+                      email: resumeData.email,
+                      phone: resumeData.phone,
+                      summary: resumeData.summary,
+                      skills: resumeData.skills,
+                      user_id: user.id
+                    }
+                  ]);
+
+                if (error) {
+                  console.error("Error saving:", error);
+                  alert("Failed to save resume");
+                } else {
+                  console.log("Saved successfully");
+                  alert("Resume Saved ✅");
+                }
+              } catch (err) {
+                console.error(err);
+                alert("Something went wrong");
+              }
+            };
+            
+            setIsSaving(true);
+            await saveResume();
+            setSavedSuccess(true);
         } catch (err: unknown) {
             setError(err instanceof Error ? err.message : "An unexpected error occurred");
         } finally {
