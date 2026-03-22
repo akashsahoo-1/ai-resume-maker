@@ -69,7 +69,7 @@ const LoadingView = ({ type }: { type: "generate" | "analyze" | "enhance" | null
                 </div>
                 <div className="text-center space-y-2">
                     <h3 className="text-2xl font-bold text-white tracking-wide">
-                        {type === "generate" && "AI is generating your resume..."}
+                        {type === "generate" && "AI is processing your resume..."}
                         {type === "analyze" && "AI is analyzing ATS compatibility..."}
                         {type === "enhance" && "AI is improving your resume..."}
                     </h3>
@@ -82,6 +82,30 @@ const LoadingView = ({ type }: { type: "generate" | "analyze" | "enhance" | null
             </motion.div>
         </div>
     );
+};
+
+const saveResume = async (resumeData: any) => {
+    const { data: { user } } = await supabaseClient.auth.getUser();
+
+    if (!user) {
+        console.warn("User not logged in");
+        return;
+    }
+
+    const { error } = await supabaseClient.from("resumes").insert({
+        full_name: resumeData.full_name,
+        email: resumeData.email,
+        phone: resumeData.phone,
+        summary: resumeData.summary,
+        skills: resumeData.skills,
+        user_id: user.id
+    });
+
+    if (error) {
+        console.error("Save failed:", error.message);
+    } else {
+        console.log("Resume saved successfully");
+    }
 };
 
 export default function BuilderPage() {
@@ -200,6 +224,19 @@ export default function BuilderPage() {
 
             const result = await response.json();
             setGeneratedMarkdown(result.markdown);
+
+            try {
+                const resumeData = {
+                    full_name: data.fullName,
+                    email: data.email,
+                    phone: data.phone,
+                    summary: data.summary,
+                    skills: data.skills
+                };
+                await saveResume(resumeData);
+            } catch (err) {
+                console.error(err);
+            }
 
             // 2. Save to Supabase (in background or await)
             setIsSaving(true);
@@ -436,7 +473,7 @@ export default function BuilderPage() {
 
             {/* Form Section */}
             <div className="w-full md:w-1/2 p-6 md:p-12 lg:p-16 border-r border-white/5 bg-black/40 backdrop-blur-xl h-screen overflow-y-auto custom-scrollbar relative z-10">
-                <div className="flex items-center justify-between mb-8">
+                <div className="flex items-center justify-between mb-10 pb-4 border-b border-white/5">
                     <Link
                         href="/"
                         className="inline-flex items-center gap-2 text-neutral-400 hover:text-white transition-colors"
@@ -474,24 +511,24 @@ export default function BuilderPage() {
                     <p className="text-neutral-400">Enter your details and let AI do the heavy lifting.</p>
                 </div>
 
-                <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <motion.form initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }} onSubmit={handleSubmit(onSubmit)} className="space-y-8">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                         <div className="space-y-2">
-                            <label className="text-sm font-medium text-neutral-300">Full Name</label>
+                            <label className="text-sm font-bold text-neutral-200 tracking-wide">Full Name</label>
                             <input
                                 {...register("fullName")}
-                                className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-purple-500/50 hover:border-purple-500/30 transition-all text-white placeholder:text-neutral-600 shadow-[inset_0_2px_10px_rgba(0,0,0,0.2)]"
+                                className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-purple-500/40 hover:border-purple-500/30 transition-all duration-200 text-white placeholder:text-neutral-500 focus:shadow-[0_0_15px_rgba(168,85,247,0.15)] shadow-[inset_0_2px_10px_rgba(0,0,0,0.2)]"
                                 placeholder="John Doe"
                             />
                             {errors.fullName && <p className="text-red-400 text-xs mt-1">{errors.fullName.message}</p>}
                         </div>
 
                         <div className="space-y-2">
-                            <label className="text-sm font-medium text-neutral-300">Email Address</label>
+                            <label className="text-sm font-bold text-neutral-200 tracking-wide">Email Address</label>
                             <input
                                 {...register("email")}
                                 type="email"
-                                className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-purple-500/50 hover:border-purple-500/30 transition-all text-white placeholder:text-neutral-600 shadow-[inset_0_2px_10px_rgba(0,0,0,0.2)]"
+                                className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-purple-500/40 hover:border-purple-500/30 transition-all duration-200 text-white placeholder:text-neutral-500 focus:shadow-[0_0_15px_rgba(168,85,247,0.15)] shadow-[inset_0_2px_10px_rgba(0,0,0,0.2)]"
                                 placeholder="john@example.com"
                             />
                             {errors.email && <p className="text-red-400 text-xs mt-1">{errors.email.message}</p>}
@@ -499,7 +536,7 @@ export default function BuilderPage() {
                     </div>
 
                     <div className="space-y-2">
-                        <label className="text-sm font-medium text-neutral-300">Phone</label>
+                        <label className="text-sm font-bold text-neutral-200 tracking-wide">Phone</label>
                         <div className="
                             [&_.react-international-phone-input-container]:flex 
                             [&_.react-international-phone-input-container]:w-full
@@ -543,7 +580,7 @@ export default function BuilderPage() {
 
                     <div className="space-y-2 relative">
                         <div className="flex items-center justify-between">
-                            <label className="text-sm font-medium text-neutral-300">Professional Summary</label>
+                            <label className="text-sm font-bold text-neutral-200 tracking-wide">Professional Summary</label>
                             {(!watch("summary") || watch("summary").trim() === "") && (
                                 <button
                                     type="button"
@@ -556,7 +593,7 @@ export default function BuilderPage() {
                                     ) : (
                                         <span>✨</span>
                                     )}
-                                    {isGeneratingSummary ? "Generating..." : "Generate with AI"}
+                                    {isGeneratingSummary ? "Processing..." : "Generate with AI"}
                                 </button>
                             )}
                         </div>
@@ -578,7 +615,7 @@ export default function BuilderPage() {
                     </div>
 
                     <div className="space-y-2">
-                        <label className="text-sm font-medium text-neutral-300">Skills (Comma separated)</label>
+                        <label className="text-sm font-bold text-neutral-200 tracking-wide">Skills (Comma separated)</label>
                         <textarea
                             {...register("skills")}
                             rows={3}
@@ -589,7 +626,7 @@ export default function BuilderPage() {
                     </div>
 
                     <div className="space-y-2">
-                        <label className="text-sm font-medium text-neutral-300">Experience</label>
+                        <label className="text-sm font-bold text-neutral-200 tracking-wide">Experience</label>
                         <textarea
                             {...register("experience")}
                             rows={4}
@@ -600,7 +637,7 @@ export default function BuilderPage() {
                     </div>
 
                     <div className="space-y-2">
-                        <label className="text-sm font-medium text-neutral-300">Education</label>
+                        <label className="text-sm font-bold text-neutral-200 tracking-wide">Education</label>
                         <textarea
                             {...register("education")}
                             rows={3}
@@ -612,7 +649,7 @@ export default function BuilderPage() {
 
                     <div className="space-y-2">
                         <div className="flex items-center justify-between">
-                            <label className="text-sm font-medium text-neutral-300">Projects (Optional)</label>
+                            <label className="text-sm font-bold text-neutral-200 tracking-wide">Projects (Optional)</label>
                             <label className="flex items-center gap-2 cursor-pointer">
                                 <span className="text-xs text-neutral-400 font-medium">Include Section</span>
                                 <div className="relative">
@@ -641,7 +678,7 @@ export default function BuilderPage() {
 
                     <div className="space-y-2">
                         <div className="flex items-center justify-between">
-                            <label className="text-sm font-medium text-neutral-300">Certifications (Optional, comma separated)</label>
+                            <label className="text-sm font-bold text-neutral-200 tracking-wide">Certifications (Optional, comma separated)</label>
                             <label className="flex items-center gap-2 cursor-pointer">
                                 <span className="text-xs text-neutral-400 font-medium">Include Section</span>
                                 <div className="relative">
@@ -662,14 +699,14 @@ export default function BuilderPage() {
                                 }
                             })}
                             onFocus={() => setValue("includeCertifications", true)}
-                            className={`w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-purple-500/50 hover:border-purple-500/30 transition-all text-white placeholder:text-neutral-600 shadow-[inset_0_2px_10px_rgba(0,0,0,0.2)] ${!watch("includeCertifications") ? 'opacity-50' : ''}`}
+                            className={`w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-purple-500/40 hover:border-purple-500/30 transition-all duration-200 text-white placeholder:text-neutral-500 focus:shadow-[0_0_15px_rgba(168,85,247,0.15)] shadow-[inset_0_2px_10px_rgba(0,0,0,0.2)] ${!watch("includeCertifications") ? 'opacity-50' : ''}`}
                             placeholder="AWS Certified Solutions Architect, Google Cloud Professional..."
                         />
                     </div>
 
                     <div className="space-y-2">
                         <div className="flex items-center justify-between">
-                            <label className="text-sm font-medium text-neutral-300">Achievements (Optional)</label>
+                            <label className="text-sm font-bold text-neutral-200 tracking-wide">Achievements (Optional)</label>
                             <label className="flex items-center gap-2 cursor-pointer">
                                 <span className="text-xs text-neutral-400 font-medium">Include Section</span>
                                 <div className="relative">
@@ -698,7 +735,7 @@ export default function BuilderPage() {
 
                     <div className="space-y-2">
                         <div className="flex items-center justify-between">
-                            <label className="text-sm font-medium text-neutral-300">Languages (Optional, comma separated)</label>
+                            <label className="text-sm font-bold text-neutral-200 tracking-wide">Languages (Optional, comma separated)</label>
                             <label className="flex items-center gap-2 cursor-pointer">
                                 <span className="text-xs text-neutral-400 font-medium">Include Section</span>
                                 <div className="relative">
@@ -719,14 +756,14 @@ export default function BuilderPage() {
                                 }
                             })}
                             onFocus={() => setValue("includeLanguages", true)}
-                            className={`w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-purple-500/50 hover:border-purple-500/30 transition-all text-white placeholder:text-neutral-600 shadow-[inset_0_2px_10px_rgba(0,0,0,0.2)] ${!watch("includeLanguages") ? 'opacity-50' : ''}`}
+                            className={`w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-purple-500/40 hover:border-purple-500/30 transition-all duration-200 text-white placeholder:text-neutral-500 focus:shadow-[0_0_15px_rgba(168,85,247,0.15)] shadow-[inset_0_2px_10px_rgba(0,0,0,0.2)] ${!watch("includeLanguages") ? 'opacity-50' : ''}`}
                             placeholder="English (Native), Spanish (Fluent), French (Basic)..."
                         />
                     </div>
 
                     <div className="space-y-2">
                         <div className="flex items-center justify-between">
-                            <label className="text-sm font-medium text-neutral-300">Hobbies (Optional, comma separated)</label>
+                            <label className="text-sm font-bold text-neutral-200 tracking-wide">Hobbies (Optional, comma separated)</label>
                             <label className="flex items-center gap-2 cursor-pointer">
                                 <span className="text-xs text-neutral-400 font-medium">Include Section</span>
                                 <div className="relative">
@@ -749,34 +786,34 @@ export default function BuilderPage() {
                             onBlur={(e) => {
                                 if (e.target.value.trim() === "") setValue("includeHobbies", false);
                             }}
-                            className={`w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-purple-500/50 hover:border-purple-500/30 transition-all text-white placeholder:text-neutral-600 shadow-[inset_0_2px_10px_rgba(0,0,0,0.2)] ${!watch("includeHobbies") ? 'opacity-50' : ''}`}
+                            className={`w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-purple-500/40 hover:border-purple-500/30 transition-all duration-200 text-white placeholder:text-neutral-500 focus:shadow-[0_0_15px_rgba(168,85,247,0.15)] shadow-[inset_0_2px_10px_rgba(0,0,0,0.2)] ${!watch("includeHobbies") ? 'opacity-50' : ''}`}
                             placeholder="Reading, Traveling, Photography..."
                         />
                     </div>
 
 
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                         <div className="space-y-2">
-                            <label className="text-sm font-medium text-neutral-300">GitHub URL</label>
+                            <label className="text-sm font-bold text-neutral-200 tracking-wide">GitHub URL</label>
                             <input
                                 {...register("github")}
-                                className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-purple-500/50 hover:border-purple-500/30 transition-all text-white placeholder:text-neutral-600 shadow-[inset_0_2px_10px_rgba(0,0,0,0.2)]"
+                                className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-purple-500/40 hover:border-purple-500/30 transition-all duration-200 text-white placeholder:text-neutral-500 focus:shadow-[0_0_15px_rgba(168,85,247,0.15)] shadow-[inset_0_2px_10px_rgba(0,0,0,0.2)]"
                                 placeholder="github.com/johndoe"
                             />
                         </div>
                         <div className="space-y-2">
-                            <label className="text-sm font-medium text-neutral-300">LinkedIn URL</label>
+                            <label className="text-sm font-bold text-neutral-200 tracking-wide">LinkedIn URL</label>
                             <input
                                 {...register("linkedin")}
-                                className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-purple-500/50 hover:border-purple-500/30 transition-all text-white placeholder:text-neutral-600 shadow-[inset_0_2px_10px_rgba(0,0,0,0.2)]"
+                                className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-purple-500/40 hover:border-purple-500/30 transition-all duration-200 text-white placeholder:text-neutral-500 focus:shadow-[0_0_15px_rgba(168,85,247,0.15)] shadow-[inset_0_2px_10px_rgba(0,0,0,0.2)]"
                                 placeholder="linkedin.com/in/johndoe"
                             />
                         </div>
                         <div className="space-y-2">
-                            <label className="text-sm font-medium text-neutral-300">Portfolio URL</label>
+                            <label className="text-sm font-bold text-neutral-200 tracking-wide">Portfolio URL</label>
                             <input
                                 {...register("portfolio")}
-                                className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-purple-500/50 hover:border-purple-500/30 transition-all text-white placeholder:text-neutral-600 shadow-[inset_0_2px_10px_rgba(0,0,0,0.2)]"
+                                className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-purple-500/40 hover:border-purple-500/30 transition-all duration-200 text-white placeholder:text-neutral-500 focus:shadow-[0_0_15px_rgba(168,85,247,0.15)] shadow-[inset_0_2px_10px_rgba(0,0,0,0.2)]"
                                 placeholder="johndoe.com"
                             />
                         </div>
@@ -797,7 +834,7 @@ export default function BuilderPage() {
                                 setShowEnhanceModal(true);
                             }}
                             disabled={isEnhancing || isGenerating || isAnalyzing}
-                            className="w-full py-4 px-6 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-xl font-bold transition-all shadow-[0_0_30px_-5px_rgba(139,92,246,0.5)] hover:shadow-[0_0_40px_-5px_rgba(139,92,246,0.7)] flex justify-center items-center gap-2 border border-white/10 relative overflow-hidden group/btn"
+                            className="w-full py-4 px-6 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-xl font-bold transition-all duration-200 hover:scale-[1.02] active:scale-[0.97] shadow-[0_0_30px_-5px_rgba(139,92,246,0.5)] hover:shadow-[0_0_40px_-5px_rgba(139,92,246,0.7)] flex justify-center items-center gap-2 border border-white/10 relative overflow-hidden group/btn"
                         >
                             <div className="absolute inset-0 bg-white/20 translate-y-full group-hover/btn:translate-y-0 transition-transform duration-300 ease-out z-0" />
                             <div className="relative z-10 flex items-center gap-2">
@@ -826,7 +863,7 @@ export default function BuilderPage() {
                                 {isGenerating ? (
                                     <>
                                         <Wand2 className="w-5 h-5 animate-pulse" />
-                                        Generating...
+                                        Processing...
                                     </>
                                 ) : (
                                     <>
@@ -857,12 +894,12 @@ export default function BuilderPage() {
                             </button>
                         </div>
                     </div>
-                </form>
+                </motion.form>
             </div>
 
             {/* Preview Section */}
-            <div className="w-full md:w-1/2 bg-black/20 backdrop-blur-md relative h-screen overflow-y-auto custom-scrollbar flex flex-col border-l border-white/5">
-                <div className="sticky top-0 bg-black/60 backdrop-blur-xl border-b border-white/5 p-4 z-10 flex justify-between items-center px-8 shadow-xl">
+            <div className="w-full md:w-1/2 bg-black/10 backdrop-blur-xl relative h-screen overflow-y-auto custom-scrollbar flex flex-col border-l border-white/10 shadow-[-10px_0_30px_rgba(0,0,0,0.5)]">
+                <div className="sticky top-0 bg-black/40 backdrop-blur-2xl border-b border-white/10 p-5 z-10 flex justify-between items-center px-8 shadow-xl">
                     <div className="flex items-center gap-4">
                         <h2 className="font-medium text-neutral-300 flex items-center gap-2">
                             <span className="w-2 h-2 rounded-full bg-indigo-500 animate-pulse"></span>
@@ -890,10 +927,11 @@ export default function BuilderPage() {
                                 initial={{ opacity: 0, scale: 0.9 }}
                                 animate={{ opacity: 1, scale: 1 }}
                                 exit={{ opacity: 0, scale: 0.9 }}
+                                transition={{ duration: 1.5, ease: "easeOut" }}
                                 className="flex items-center gap-1.5 text-emerald-400 text-sm font-medium bg-emerald-500/10 px-3 py-1.5 rounded-full"
                             >
                                 <CheckCircle className="w-4 h-4" />
-                                Saved to DB
+                                ✔ Saved
                             </motion.div>
                         )}
                         {isSaving && (
@@ -904,7 +942,7 @@ export default function BuilderPage() {
                                 exit={{ opacity: 0, scale: 0.9 }}
                                 className="flex items-center gap-1.5 text-neutral-400 text-sm font-medium bg-white/5 px-3 py-1.5 rounded-full"
                             >
-                                <Save className="w-4 h-4 animate-pulse" />
+                                <Loader2 className="w-4 h-4 animate-spin" />
                                 Saving...
                             </motion.div>
                         )}
@@ -974,7 +1012,7 @@ export default function BuilderPage() {
                                         initial={{ opacity: 0, y: 20 }}
                                         animate={{ opacity: 1, y: 0 }}
                                         exit={{ opacity: 0, y: -10 }}
-                                        className="w-full bg-neutral-900 border border-white/10 rounded-3xl p-8 shadow-2xl"
+                                        className="w-full bg-neutral-900/60 backdrop-blur-md border border-white/10 rounded-xl p-8 shadow-2xl"
                                     >
                                         <div className="flex items-center gap-3 mb-6">
                                             <div className="w-10 h-10 rounded-xl bg-indigo-500/10 flex items-center justify-center">
@@ -1056,7 +1094,7 @@ export default function BuilderPage() {
                                         return (
                                             <div key={key} className="space-y-4">
                                                 <h3 className="text-lg font-bold text-indigo-400 uppercase tracking-wider">{key}</h3>
-                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                                                     <div className="space-y-2">
                                                         <p className="text-xs font-bold text-neutral-500 uppercase">Original</p>
                                                         <div className="p-4 bg-neutral-800/50 border border-white/5 rounded-2xl text-neutral-400 text-sm italic whitespace-pre-wrap">

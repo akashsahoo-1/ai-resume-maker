@@ -47,7 +47,7 @@ export default function AuthButton() {
         <span className="text-sm font-medium">{user.user_metadata?.full_name}</span>
         <button 
           onClick={signOut}
-          className="px-3 py-1.5 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-md transition-colors"
+          className="px-3 py-1.5 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-md transition-all duration-200 hover:scale-[1.02] active:scale-[0.97]"
         >
           Logout
         </button>
@@ -58,7 +58,7 @@ export default function AuthButton() {
   return (
     <button
       onClick={signIn}
-      className="px-4 py-2 bg-white text-black font-medium rounded-lg shadow hover:bg-gray-100 transition-colors"
+      className="px-4 py-2 bg-white text-black font-medium rounded-lg shadow hover:bg-gray-100 transition-all duration-200 hover:scale-[1.02] active:scale-[0.97]"
     >
       Sign in with Google
     </button>

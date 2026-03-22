@@ -9,7 +9,7 @@ export default function Home() {
   return (
     <div className="relative min-h-screen">
       {/* Navigation */}
-      <nav className="fixed top-0 w-full z-50 border-b border-white/5 bg-black/40 backdrop-blur-xl">
+      <nav className="fixed top-0 w-full z-50 border-b border-white/5 bg-black/20 backdrop-blur-2xl">
         <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
           <div className="flex items-center gap-3 font-bold text-2xl tracking-tight">
             <div className="relative flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-indigo-600 shadow-[0_0_20px_rgba(139,92,246,0.3)]">
@@ -73,7 +73,7 @@ export default function Home() {
             className="flex flex-col sm:flex-row gap-6"
           >
             <Link href="/builder">
-              <button className="group relative inline-flex items-center justify-center gap-3 px-10 py-5 text-lg font-semibold text-white bg-gradient-to-r from-purple-600 to-indigo-600 rounded-full overflow-hidden transition-all duration-300 hover:scale-105 active:scale-95 shadow-[0_0_40px_-10px_rgba(139,92,246,0.6)] hover:shadow-[0_0_60px_-10px_rgba(139,92,246,0.8)] border border-white/10">
+              <button className="group relative inline-flex items-center justify-center gap-3 px-10 py-5 text-lg font-semibold text-white bg-gradient-to-r from-purple-600 to-indigo-600 rounded-full overflow-hidden transition-all duration-300 hover:scale-[1.02] active:scale-[0.97] transition-all duration-200 shadow-[0_0_40px_-10px_rgba(139,92,246,0.6)] hover:shadow-[0_0_60px_-10px_rgba(139,92,246,0.8)] border border-white/10">
                 <span className="relative z-10">Build Resume Now</span>
                 <ArrowRight className="w-5 h-5 relative z-10 group-hover:translate-x-1 transition-transform" />
                 <div className="absolute inset-0 bg-gradient-to-r from-indigo-600 to-purple-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
@@ -125,7 +125,7 @@ function FeatureCard({ icon, title, desc, delay }: { icon: React.ReactNode, titl
       className="relative p-[1px] rounded-3xl bg-gradient-to-b from-white/10 to-white/5 group"
     >
       <div className="absolute inset-0 bg-gradient-to-br from-purple-500/0 via-purple-500/0 to-purple-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-3xl" />
-      <div className="relative h-full p-8 rounded-[23px] bg-black/40 backdrop-blur-xl border border-white/5 overflow-hidden">
+      <div className="relative h-full p-8 rounded-[23px] bg-black/20 backdrop-blur-2xl border border-white/5 overflow-hidden">
         {/* Glow behind icon */}
         <div className="absolute top-0 right-0 w-32 h-32 bg-purple-500/10 blur-[40px] rounded-full group-hover:bg-purple-500/20 transition-colors duration-500" />
         
