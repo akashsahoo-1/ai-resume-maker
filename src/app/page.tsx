@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { ArrowRight, Sparkles, FileText, CheckCircle, LayoutTemplate } from "lucide-react";
+import AuthButton from "@/components/AuthButton";
 
 export default function Home() {
   return (
@@ -16,14 +17,17 @@ export default function Home() {
             </div>
             <span className="bg-clip-text text-transparent bg-gradient-to-r from-white to-white/70">AI Resume Maker</span>
           </div>
-          <Link href="/builder">
-            <button className="relative group overflow-hidden rounded-full p-[1px]">
-              <span className="absolute inset-0 bg-gradient-to-r from-purple-500 via-indigo-500 to-purple-500 rounded-full opacity-70 group-hover:opacity-100 animate-spin-[3s_linear_infinite]" />
-              <div className="relative bg-black/90 backdrop-blur-md px-6 py-2.5 rounded-full text-sm font-medium text-white/90 group-hover:text-white transition-colors duration-300">
-                Get Started
-              </div>
-            </button>
-          </Link>
+          <div className="flex items-center gap-4">
+            <AuthButton />
+            <Link href="/builder">
+              <button className="relative group overflow-hidden rounded-full p-[1px]">
+                <span className="absolute inset-0 bg-gradient-to-r from-purple-500 via-indigo-500 to-purple-500 rounded-full opacity-70 group-hover:opacity-100 animate-spin-[3s_linear_infinite]" />
+                <div className="relative bg-black/90 backdrop-blur-md px-6 py-2.5 rounded-full text-sm font-medium text-white/90 group-hover:text-white transition-colors duration-300">
+                  Get Started
+                </div>
+              </button>
+            </Link>
+          </div>
         </div>
       </nav>
 

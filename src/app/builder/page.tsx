@@ -124,12 +124,8 @@ export default function BuilderPage() {
 
     useEffect(() => {
         const checkAuth = async () => {
-            const { data: { session } } = await supabaseClient.auth.getSession();
-            if (!session) {
-                router.push("/login");
-            } else {
-                setIsCheckingAuth(false);
-            }
+            await supabaseClient.auth.getSession();
+            setIsCheckingAuth(false);
         };
 
         checkAuth();
@@ -155,10 +151,8 @@ export default function BuilderPage() {
             setGeneratedMarkdown(savedMarkdown);
         }
 
-        const { data: { subscription } } = supabaseClient.auth.onAuthStateChange((_event, session) => {
-            if (!session) {
-                router.push("/login");
-            }
+        const { data: { subscription } } = supabaseClient.auth.onAuthStateChange((_event: any, session: any) => {
+            // No redirect needed, user can view the builder page
         });
 
         return () => subscription.unsubscribe();
@@ -180,6 +174,12 @@ export default function BuilderPage() {
     }, [generatedMarkdown]);
 
     const onSubmit = async (data: FormValues) => {
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        if (!session) {
+            setError("Please login with Google to generate resume");
+            return;
+        }
+        
         setIsGenerating(true);
         setLoadingType("generate");
         setError(null);
