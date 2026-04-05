@@ -58,9 +58,12 @@ export default function AuthButton() {
   return (
     <button
       onClick={signIn}
-      className="px-4 py-2 bg-white text-black font-medium rounded-lg shadow hover:bg-gray-100 transition-all duration-200 hover:scale-[1.02] active:scale-[0.97]"
+      className="relative group overflow-hidden rounded-full p-[1px]"
     >
-      Sign in with Google
+      <span className="absolute inset-0 bg-gradient-to-r from-purple-500 via-indigo-500 to-purple-500 rounded-full opacity-70 group-hover:opacity-100 animate-spin-[3s_linear_infinite]" />
+      <div className="relative bg-black/90 backdrop-blur-md px-6 py-2.5 rounded-full text-sm font-medium text-white/90 group-hover:text-white transition-colors duration-300">
+        Sign in with Google
+      </div>
     </button>
   );
 }
